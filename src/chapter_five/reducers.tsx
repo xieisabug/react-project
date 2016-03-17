@@ -4,7 +4,7 @@
 
 import { INCREASE_ACTION } from './actions'
 
-function count(state = { count:0 }, action) {
+function count(state = { count:10 }, action) {
     let count = state.count;
 
     switch (action.type) {

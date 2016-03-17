@@ -6,11 +6,15 @@ import SearchBar from './SearchBar';
 import ProductTable from './ProductTable'
 
 class FilterableProductTable extends React.Component<any, any> {
+
+
     render() {
+        const {products} = this.props;
+
         return (
             <div>
                 <SearchBar />
-                <ProductTable products={this.props.products} />
+                <ProductTable products={products} />
             </div>
         )
     }

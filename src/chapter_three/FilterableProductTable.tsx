@@ -5,17 +5,10 @@
 import SearchBar from './SearchBar';
 import ProductTable from './ProductTable'
 
-class FilterableProductTable extends React.Component<FilterableProductTableProps, FilterableProductTableState> {
-
-    state:FilterableProductTableState;
-
-    constructor(props:FilterableProductTableProps) {
+class FilterableProductTable extends React.Component<any, any> {
+    constructor(props) {
         super(props);
-        this.state = {'filterText':'',inStockOnly:false};
-    }
-
-    getInitializeState() {
-        return this.state;
+        this.state = {'filterText':'',inStockOnly:false}
     }
 
     handleUserInput = (filterText, inStockOnly) => {
@@ -23,9 +16,11 @@ class FilterableProductTable extends React.Component<FilterableProductTableProps
             filterText: filterText,
             inStockOnly: inStockOnly
         })
-    }
+    };
 
     render() {
+        const { products } = this.props;
+
         return (
             <div>
                 <SearchBar
@@ -34,7 +29,7 @@ class FilterableProductTable extends React.Component<FilterableProductTableProps
                     onUserInput={this.handleUserInput}
                 />
                 <ProductTable
-                    products={this.props.products}
+                    products={products}
                     filterText={this.state.filterText}
                     inStockOnly={this.state.inStockOnly}
                 />

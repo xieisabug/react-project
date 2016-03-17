@@ -22,12 +22,6 @@ class IndexComponent extends Component<any, any> {
     }
 }
 
-//IndexComponent.propTypes = {
-//    value : PropTypes.string.isRequired,
-//    onIncreaseClick : PropTypes.func.isRequired
-//};
-
-
 function mapStateToProps(state) {
     return {
         value: state.count

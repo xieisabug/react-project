@@ -5,12 +5,13 @@
 import ProductCategoryRow from './ProductCategoryRow'
 import ProductRow from './ProductRow'
 
-class ProductTable extends React.Component<ProductTableProps, any> {
+class ProductTable extends React.Component<any, any> {
 
     render() {
+        const { products } = this.props;
         var rows = [];
         var lastCategory = null;
-        this.props.products.forEach(function(product){
+        products.forEach(function(product){
             if (product.category !== lastCategory) {
                 rows.push(<ProductCategoryRow category="product.category" key={product.category} />)
             }

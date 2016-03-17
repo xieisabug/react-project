@@ -5,12 +5,13 @@
 import ProductCategoryRow from './ProductCategoryRow'
 import ProductRow from './ProductRow'
 
-class ProductTable extends React.Component<ProductTableProps, any> {
+class ProductTable extends React.Component<any, any> {
 
     render() {
+        const { products } = this.props;
         var rows = [];
         var lastCategory = null;
-        this.props.products.forEach(function(product){
+        products.forEach(function(product){
             // todo diff from chapter_two
             if(product.name.indexOf(this.props.filterText) === -1 || (!product.stocked && this.props.inStockOnly)) {
                 return;
