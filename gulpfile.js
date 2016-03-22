@@ -4,7 +4,7 @@ var typescript = require('gulp-typescript');
 var typescriptConfig = {
     "module" : "commonjs",
     "jsx" : "react",
-    "target": "es5",
+    "target": "es3",
     "sourceMap": true
 };
 var webpack = require('webpack');

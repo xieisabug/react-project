@@ -24,14 +24,14 @@ class SearchBar extends React.Component<any, any> {
                     placeholder="Search..."
                     value={filterText}
                     ref="filterTextInput"
-                    onChange={this.handleChange.bind(this)}
+                    onChange={this.handleChange}
                 />
                 <p>
                     <input
                         type="checkbox"
                         checked={inStockOnly}
                         ref="inStockOnlyInput"
-                        onChange={this.handleChange.bind(this)}
+                        onChange={this.handleChange}
                     />
                     {' '}
                     Only show products in stock

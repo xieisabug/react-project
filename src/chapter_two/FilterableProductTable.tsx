@@ -7,13 +7,18 @@ import ProductTable from './ProductTable'
 
 class FilterableProductTable extends React.Component<any, any> {
 
+    constructor(props) {
+        super(props);
+        this.state = {'filterText':'',inStockOnly:false}
+    }
 
     render() {
         const {products} = this.props;
 
         return (
             <div>
-                <SearchBar />
+                <SearchBar filterText={this.state.filterText}
+                           inStockOnly={this.state.inStockOnly}/>
                 <ProductTable products={products} />
             </div>
         )
