@@ -17,7 +17,7 @@ import UserFormComponent from './component/user.form.component';
 
 const logger = createLogger();
 
-const store = createStore(combineReducers({reducer,routing: routerReducer}), compose(
+const store = createStore(reducer, compose(
     applyMiddleware(thunk, logger, routerMiddleware(hashHistory)),
     window['devToolsExtension'] ? window['devToolsExtension']() : f => f
 ));

@@ -63,7 +63,7 @@ const addUser = (username, age) => {
 
 export function fetchGetIfNeeded() {
     return (dispatch, getState) => {
-        if(!getState().reducer.manager.users.length) {
+        if(!getState().manager.users.length) {
             dispatch(fetchGet());
         }
     }

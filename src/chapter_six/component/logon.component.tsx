@@ -35,8 +35,8 @@ class LogonComponent extends React.Component<any, any> {
 function mapStateToProps(state) {
 
     return {
-        result: state.reducer.logon.rsp,
-        isFetching: state.reducer.logon.isFetching
+        result: state.logon.rsp,
+        isFetching: state.logon.isFetching
     }
 }
 
