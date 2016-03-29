@@ -5,11 +5,11 @@
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux'
 
-import logon from './logon.reducer';
-import manager from './manager.reducer';
+import logonReducer from './logon.reducer';
+import managerReducer from './manager.reducer';
 
 export default combineReducers({
-    logon,
-    manager,
+    logonReducer,
+    managerReducer,
     routing: routerReducer
 });

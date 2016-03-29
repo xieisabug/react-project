@@ -34,7 +34,7 @@ class ManagerComponent extends React.Component<any, any> {
 function mapStateToProps(state) {
 
     return {
-        users: state.manager.users
+        users: state.managerReducer.users
     }
 }
 
