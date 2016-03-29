@@ -11,7 +11,7 @@ export const RECEIVE_POSTS = 'RECEIVE_POSTS';
 function requestPosts(username) {
     return {
         type: REQUEST_POSTS,
-        userName:username
+        userName: username
     }
 }
 
@@ -27,26 +27,18 @@ export const fetchPosts = (username) => {
         dispatch(requestPosts(username));
 
         return fetch('./mock/logon.json', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: "username="+username
-        })
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "username=" + username
+            })
             .then(response => response.json())
             .then(json => {
                 dispatch(receivePosts(json));
                 if (json.code === 0) {
                     dispatch(push('/manager'));
                 }
-            })
+            });
     }
 };
-
-//export const logonIfNeed = (username) => {
-//    return (dispatch, getState) => {
-//        //if(shouldFetchPost(getState())){
-//            return dispatch(logon(username))
-//        //}
-//    };
-//};
