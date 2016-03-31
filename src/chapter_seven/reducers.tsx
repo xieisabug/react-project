@@ -3,6 +3,7 @@ import {
     SELECT_SUBREDDIT, INVALIDATE_SUBREDDIT ,
     REQUEST_POSTS, RECEIVE_POSTS
 } from './actions'
+import objectAssign = require("object-assign");
 
 function selectedSubreddit(state = 'reactjs', action) {
     switch (action.type) {
@@ -20,23 +21,24 @@ function posts(state = {
 }, action) {
     switch (action.type) {
         case INVALIDATE_SUBREDDIT :
-            return Object.assign({}, state, {
+
+            return objectAssign({}, state, {
                 didInvalidate: true
             });
         case REQUEST_POSTS:
-            return Object.assign({}, state, {
+            return objectAssign({}, state, {
                 isFetching: true,
                 didInvalidate: false
             });
         case RECEIVE_POSTS:
-            return Object.assign({}, state, {
+            return objectAssign({}, state, {
                 isFetching: false,
                 didInvalidate: false,
                 items: action.posts,
                 lastUpdated: action.receivedAt
             });
         default:
-            return state
+            return state;
     }
 }
 
@@ -45,7 +47,7 @@ function postsBySubreddit(state = { }, action) {
         case INVALIDATE_SUBREDDIT :
         case RECEIVE_POSTS:
         case REQUEST_POSTS:
-            return Object.assign({}, state, {
+            return objectAssign({}, state, {
                 [action.subreddit]: posts(state[action.subreddit], action)
             });
         default:

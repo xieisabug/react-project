@@ -11,17 +11,16 @@ class AsyncApp extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        //debugger;
         const { dispatch, selectedSubreddit } = this.props;
         dispatch(fetchPostsIfNeeded(selectedSubreddit))
     }
 
     componentWillReceiveProps(nextProps) {
-        //const { selectedSubreddit } = this.props;
-        //if (nextProps.selectedSubreddit !== selectedSubreddit) {
-        //    const { dispatch, selectedSubreddit } = nextProps;
-        //    dispatch(fetchPostsIfNeeded(selectedSubreddit))
-        //}
+        const { selectedSubreddit } = this.props;
+        if (nextProps.selectedSubreddit !== selectedSubreddit) {
+            const { dispatch, selectedSubreddit } = nextProps;
+            dispatch(fetchPostsIfNeeded(selectedSubreddit))
+        }
     }
 
     handleChange(nextSubreddit) {
@@ -80,7 +79,7 @@ function mapStateToProps(state) {
         isFetching,
         lastUpdated,
         items: posts
-        } = postsBySubreddit[selectedSubreddit] || {
+    } = postsBySubreddit[selectedSubreddit] || {
         isFetching: true,
         lastUpdated : '',
         items: []

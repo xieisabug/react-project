@@ -4,12 +4,11 @@
 
 /// <reference path="../../typings/tsd.d.ts" />
 
-import { Component, PropTypes } from 'react'
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux'
 import * as Actions from './actions';
 
-class IndexComponent extends Component<any, any> {
+class IndexComponent extends React.Component<any, any> {
     render() {
         const { value, increment } = this.props;
 

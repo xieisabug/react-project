@@ -4,7 +4,6 @@
 
 /// <reference path="../../typings/tsd.d.ts" />
 
-import { render } from 'react-dom';
 import { Router, Route, hashHistory, IndexRoute } from 'react-router';
 
 import AppComponent from './app.component';
@@ -13,7 +12,7 @@ import ReposComponent from './repos.component';
 import RepoComponent from './repo.component';
 import HomeComponent from './home.component';
 
-render((
+ReactDOM.render((
     <Router history={hashHistory}>
         <Route path="/" component={AppComponent}>
             <IndexRoute component={HomeComponent} />

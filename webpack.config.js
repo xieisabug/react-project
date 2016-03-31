@@ -17,7 +17,8 @@ module.exports = {
     },
     module: {
         loaders: [
-            {test: /\.js$/, loader: 'jsx-loader?harmony'}
+            {test: /\.js$/, loader: 'jsx-loader?harmony'},
+            {test: /\.sass$/,loader: 'style-loader!css-loader!autoprefixer-loader!sass-loader'}
         ]
     },
     externals: {

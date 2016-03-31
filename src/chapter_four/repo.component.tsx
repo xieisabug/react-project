@@ -2,20 +2,15 @@
  * Created by Gene on 16/3/15.
  */
 
-interface Params {
-    userName: string,
-    repoName: string
-}
 
-interface RepoProps {
-    params : Params
-}
+class Repo extends React.Component<any, any> {
 
-class Repo extends React.Component<RepoProps, any> {
+
     render() {
+        const { params } = this.props;
         return (
             <div>
-                <h2>{this.props.params.repoName}</h2>
+                <h2>{params['repoName']}</h2>
             </div>
         )
     }

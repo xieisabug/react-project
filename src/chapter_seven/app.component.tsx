@@ -5,7 +5,7 @@
 import { Provider } from 'react-redux';
 import { compose, applyMiddleware, createStore } from 'redux';
 import thunk from 'redux-thunk';
-import createLogger from 'redux-logger';
+import createLogger = require("redux-logger");
 
 import reducer from './reducers'
 import AsyncApp from './AsyncApp';
