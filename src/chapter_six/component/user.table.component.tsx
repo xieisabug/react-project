@@ -12,15 +12,22 @@ class UserTableComponent extends React.Component<any, any> {
         var rows = [];
 
         users.forEach(function(user, index){
-            user['seq'] = index;
-            rows.push(<UserTableRowComponent {...user} key={user.userName} modifyUserProperty={modifyUserProperty} openUserFormAction={openUserFormAction} />);
+
+            rows.push(
+                <UserTableRowComponent
+                    user={user}
+                    seq={index}
+                    key={user.userName}
+                    modifyUserProperty={modifyUserProperty}
+                    openUserFormAction={openUserFormAction}
+                />);
         });
 
         return (
             <table>
                 <thead>
                     <tr>
-                        <th></th>
+                        <th> </th>
                         <th>seq</th>
                         <th>username</th>
                         <th>age</th>

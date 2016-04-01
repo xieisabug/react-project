@@ -10,6 +10,7 @@ export const MODIFY_USER = 'MODIFY_USER';
 
 export const REQUEST_GET = 'REQUEST_GET';
 export const RECEIVE_GET = 'RECEIVE_GET';
+export const INITIALIZE_USER_FORM = 'INITIALIZE_USER_FORM';
 
 
 export const deleteUser = () => {
@@ -61,6 +62,13 @@ const addUser = (username, age) => {
     };
 };
 
+const initializeUserForm = (user) => {
+    return {
+        type: INITIALIZE_USER_FORM,
+        user
+    }
+};
+
 export function fetchGetIfNeeded() {
     return (dispatch, getState) => {
         if(!getState().managerReducer.users.length) {
@@ -92,9 +100,10 @@ export const modifyUserProperty = (index, checked) => {
     }
 };
 
-export const openUserFormAction = (username, age, seq) => {
+export const openUserFormAction = (user, seq) => {
     return dispatch => {
-        dispatch(push('/modifyUser/'+username+'/'+age +'/'+seq));
+        dispatch(push('/modifyUser/'+seq));
+        dispatch(initializeUserForm(user));
     }
 };
 

@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch'
+import fetch from 'isomorphic-fetch';
 
 export const REQUEST_POSTS = 'REQUEST_POSTS';
 export const RECEIVE_POSTS = 'RECEIVE_POSTS';
@@ -9,21 +9,21 @@ export function selectSubreddit(subreddit) {
     return {
         type: SELECT_SUBREDDIT,
         subreddit
-    }
+    };
 }
 
 export function invalidateSubreddit(subreddit) {
     return {
         type: INVALIDATE_SUBREDDIT ,
         subreddit
-    }
+    };
 }
 
 function requestPosts(subreddit) {
     return {
         type: REQUEST_POSTS,
         subreddit
-    }
+    };
 }
 
 function receivePosts(subreddit, json) {
@@ -32,7 +32,7 @@ function receivePosts(subreddit, json) {
         subreddit,
         posts: json.data.children.map(child => child.data),
         receivedAt: Date.now()
-    }
+    };
 }
 
 function fetchPosts(subreddit) {
@@ -40,8 +40,8 @@ function fetchPosts(subreddit) {
         dispatch(requestPosts(subreddit));
         return fetch(`./mock/${subreddit}.json`)
             .then(response => response.json())
-            .then(json => dispatch(receivePosts(subreddit, json)))
-    }
+            .then(json => dispatch(receivePosts(subreddit, json)));
+    };
 }
 
 function shouldFetchPosts(state, subreddit) {
@@ -60,5 +60,5 @@ export function fetchPostsIfNeeded(subreddit) {
         if (shouldFetchPosts(getState(), subreddit)) {
             return dispatch(fetchPosts(subreddit))
         }
-    }
+    };
 }

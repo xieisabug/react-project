@@ -13,17 +13,13 @@ class UserTableRowComponent extends React.Component<any, any> {
     };
 
     openUserForm = () => {
-        const { openUserFormAction } = this.props;
-        openUserFormAction(
-            this.refs['username']['innerHTML'],
-            this.refs['age']['innerHTML'],
-            this.refs['seq']['innerHTML']
-        );
+        const { openUserFormAction, user, seq } = this.props;
+        openUserFormAction(user, seq);
     };
 
     render() {
 
-        const {userName, age, seq} = this.props;
+        const {user, seq} = this.props;
 
         return (
             <tr>
@@ -31,8 +27,8 @@ class UserTableRowComponent extends React.Component<any, any> {
                     <input type="checkbox" onClick={this.selected} ref="checkbox" />
                 </td>
                 <td ref="seq">{seq}</td>
-                <td ref="username">{userName}</td>
-                <td ref="age">{age}</td>
+                <td ref="username">{user.userName}</td>
+                <td ref="age">{user.age}</td>
                 <td><button onClick={this.openUserForm}>编辑</button></td>
             </tr>
         );

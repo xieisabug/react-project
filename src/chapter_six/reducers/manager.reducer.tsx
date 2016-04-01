@@ -2,7 +2,7 @@
  * Created by Gene on 16/3/17.
  */
 
-import { ADD_USER, DELETE_USER, MODIFY_USER, REQUEST_GET, RECEIVE_GET } from '../actions/manager.action';
+import { ADD_USER, DELETE_USER, MODIFY_USER, REQUEST_GET, RECEIVE_GET, INITIALIZE_USER_FORM } from '../actions/manager.action';
 
 import objectAssign = require("object-assign");
 
@@ -32,6 +32,8 @@ export default (state = {isFetching: false, users:[]}, action) => {
             });
 
             return objectAssign({}, state, {isFetching:false, users:users});
+        case INITIALIZE_USER_FORM:
+            return objectAssign({}, state, {isFetching:false,user:action.user});
 
         default:
             return state;
