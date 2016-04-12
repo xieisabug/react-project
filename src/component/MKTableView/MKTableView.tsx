@@ -19,41 +19,65 @@ interface MKTableViewProps {
     initScrollHeight?: Function;
     scrollContainerHeight?: number;
     scrollContentHeight?: number;
+    limitDisplayTopHeight?: number;
+    limitDisplayBottomHeight?: number;
     minPointY?: number;
     maxPointY?: number;
+    bounce?: boolean;
 }
 
 class MKTableView extends React.Component<MKTableViewProps, any> {
 
+    private dataSource: MkTableViewDataSource;
+    private delegate: MKTableViewDelegate;
+    private bounce: boolean = true;
     private startPointY: number = 0;
     private startTranslateY: number = 0;
     private endTranslateY: number = 0;
     private minPointY: number = 0;
     private maxPointY: number = 0;
+    private limitDisplayTopHeight: number = 0;
+    private limitDisplayBottomHeight: number = 0;
     private startTime: number = 0;
-    private containerHeight: number = 0;
     private timer: number;
     private dampingForceLevel: number = 3;
     private tableViewStyle: Object = {
         transform: "translate3d(0px, 0px, 0px)"
     };
 
+    public tableViewHeight: number = 0;
+    public contentViewHeight: number = 0;
+
     public state = {
         scrollTopPercent : 0,
         showScrollBar : false,
         duration: 0
     };
+    
+    componentWillMount() {
+        const { dataSource, delegate, bounce } = this.props;
+        
+        this.dataSource = dataSource;
+        this.delegate = delegate;
+        this.bounce = typeof bounce == 'boolean' ? bounce : this.bounce;
+        
+    }
 
     componentDidMount() {
-        const { initScrollHeight, maxPointY, minPointY } = this.props;
+        const { initScrollHeight, limitDisplayTopHeight, limitDisplayBottomHeight } = this.props;
         const { mkTableViewContainer, mkTableView } = this.refs;
 
         let scrollContainerHeight: number = mkTableViewContainer['offsetHeight'];
         let scrollContentHeight: number = mkTableView['offsetHeight'];
 
-        this.containerHeight = scrollContainerHeight;
-        this.minPointY = scrollContainerHeight - (scrollContentHeight - minPointY);
-        this.maxPointY = maxPointY || this.maxPointY;
+        this.tableViewHeight = scrollContainerHeight;
+        this.contentViewHeight = scrollContentHeight;
+        this.limitDisplayBottomHeight = limitDisplayBottomHeight || 0;
+        this.limitDisplayTopHeight = limitDisplayTopHeight || 0;
+        this.maxPointY = limitDisplayTopHeight || this.maxPointY;
+        this.minPointY = scrollContainerHeight - (scrollContentHeight - limitDisplayBottomHeight);
+
+
         this.endTranslateY = this.maxPointY * -1;
 
         let translate3d = "translate3d(0px, -"+this.maxPointY+"px, 0px)";
@@ -181,64 +205,57 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
             let scrollTop = translateY / this.minPointY;
             this.setState({scrollTopPercent:scrollTop});
         } else if(translateY >= this.maxPointY) {
-            translateY = this.maxPointY + (translateY - this.maxPointY) / (this.dampingForceLevel + (translateY / (this.containerHeight * 0.5)));
+            translateY = this.maxPointY + (translateY - this.maxPointY) / (this.dampingForceLevel + (translateY / (this.tableViewHeight * 0.5)));
             this.refs['mkTableView']['style']['transitionDuration'] = "0ms";
             this.refs['mkTableView']['style'].transform = "translate3d(0px, " + translateY + "px, 0px)";
 
             this.setState({scrollTopPercent:0});
         } else {
             translateY = Math.abs(translateY) + this.minPointY;
-            translateY = this.minPointY - translateY / (this.dampingForceLevel + (translateY / (this.containerHeight * 0.5)));
+            translateY = this.minPointY - translateY / (this.dampingForceLevel + (translateY / (this.tableViewHeight * 0.5)));
             this.refs['mkTableView']['style']['transitionDuration'] = "0ms";
             this.refs['mkTableView']['style'].transform = "translate3d(0px, " + translateY + "px, 0px)";
             this.setState({scrollTopPercent:1});
+        }
+        
+        if (this.delegate && this.delegate.scrollViewDidScroll) {
+            this.delegate.scrollViewDidScroll(this, {x:0, y:translateY});
         }
     };
 
     private endListScroll = (event) => {
 
-
-        let transform = this.refs['mkTableView']['style'].transform;
-        this.endTranslateY = transform.split(',')[1].replace('px','') * 1;
         this.setState({showScrollBar:false});
-
-        let duration = event.timeStamp - this.startTime;
 
         if (this.timer) {
             clearTimeout(this.timer);
         }
 
-        if (this.endTranslateY >= this.maxPointY) {
-            this.refs['mkTableView']['style'].transitionTimingFunction = "cubic-bezier(0.1, 0.57, 0.1, 1)";
-            this.refs['mkTableView']['style']['transitionDuration'] = "600ms";
-            this.refs['mkTableView']['style'].transform = "translate3d(0px, -"+this.maxPointY+"px, 0px)";
-            this.endTranslateY = this.maxPointY * -1;
-        } else if (this.endTranslateY <= this.minPointY){
-            this.refs['mkTableView']['style'].transitionTimingFunction = "cubic-bezier(0.1, 0.57, 0.1, 1)";
-            this.refs['mkTableView']['style']['transitionDuration'] = "600ms";
-            this.refs['mkTableView']['style'].transform = "translate3d(0px, " + this.minPointY + "px, 0px)";
-            this.endTranslateY = this.minPointY;
-        } else if(duration < 300) {
+        let {endTranslateY, reset} = this.resetPosition(this.bounce);
 
-            let distance = this.endTranslateY - this.startTranslateY;
+        let duration = event.timeStamp - this.startTime;
+
+        if (!reset && duration < 300) {
+
+            let distance = endTranslateY - this.startTranslateY;
             let time = event.timeStamp - this.startTime;
             let speed = Math.abs(distance) / time;
             let deceleration = 0.0006;
-            let destination = Math.round(this.endTranslateY + (speed * speed) / (2 * deceleration) * ( distance < 0 ? -1 : 1 ));
+            let destination = Math.round(endTranslateY + (speed * speed) / (2 * deceleration) * ( distance < 0 ? -1 : 1 ));
 
             duration = speed / deceleration;
 
             if (destination < this.minPointY) {
-                destination = this.containerHeight ? this.minPointY - ( this.containerHeight / 2.5 * ( speed / 8 ) ) : this.minPointY;
-                distance = Math.abs(destination - this.endTranslateY);
+                destination = this.tableViewHeight ? this.minPointY - ( this.tableViewHeight / 2.5 * ( speed / 8 ) ) : this.minPointY;
+                distance = Math.abs(destination - endTranslateY);
                 duration = distance / speed;
 
                 this.timer = setTimeout(() => {
                     this.endListScroll(event);
                 }, duration);
             } else if ( destination > 0 ) {
-                destination = this.containerHeight ? this.containerHeight / 2.5 * ( speed / 8 ) : 0;
-                distance = Math.abs(this.endTranslateY) + destination;
+                destination = this.tableViewHeight ? this.tableViewHeight / 2.5 * ( speed / 8 ) : 0;
+                distance = Math.abs(endTranslateY) + destination;
                 duration = distance / speed;
 
                 this.timer = setTimeout(() => {
@@ -246,7 +263,8 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
                 }, duration);
             }
 
-            this.endTranslateY = destination;
+            this.endTranslateY = endTranslateY = destination;
+
 
             this.refs['mkTableView']['style'].transitionTimingFunction = "cubic-bezier(0.1, 0.57, 0.1, 1)";
             this.refs['mkTableView']['style']['transitionDuration'] = duration+"ms";
@@ -263,7 +281,42 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
                 duration: duration
             });
         }
+
+        if (this.delegate && this.delegate.scrollViewWillEndDragging) {
+            this.delegate.scrollViewWillEndDragging(this, {x:0,y:endTranslateY});
+        }
     };
+    
+    public resetPosition(bounce) {
+
+        let transform = this.refs['mkTableView']['style'].transform;
+        let endTranslateY = transform.split(',')[1].replace('px','') * 1;
+        let maxPointY = bounce ? this.maxPointY : 0;
+        let minPointY = bounce ? this.minPointY : this.minPointY - this.limitDisplayBottomHeight;
+
+
+            if (endTranslateY >= maxPointY || bounce ?
+                    endTranslateY >= maxPointY * -1 :
+                    endTranslateY <= 0 && endTranslateY >= this.limitDisplayTopHeight * -1 && (maxPointY = this.limitDisplayTopHeight)) {
+                this.refs['mkTableView']['style'].transitionTimingFunction = "cubic-bezier(0.1, 0.57, 0.1, 1)";
+                this.refs['mkTableView']['style']['transitionDuration'] = "600ms";
+                this.refs['mkTableView']['style'].transform = "translate3d(0px, -"+maxPointY+"px, 0px)";
+                this.endTranslateY = maxPointY * -1;
+                return {endTranslateY, reset:true};
+            } else if (endTranslateY <= minPointY || !bounce && endTranslateY < this.minPointY && endTranslateY > this.minPointY - this.limitDisplayBottomHeight && (minPointY = this.minPointY )){
+                this.refs['mkTableView']['style'].transitionTimingFunction = "cubic-bezier(0.1, 0.57, 0.1, 1)";
+                this.refs['mkTableView']['style']['transitionDuration'] = "600ms";
+                this.refs['mkTableView']['style'].transform = "translate3d(0px, " + minPointY + "px, 0px)";
+                this.endTranslateY = minPointY;
+                return {endTranslateY, reset:true};
+            }
+
+
+
+        this.endTranslateY = endTranslateY;
+
+        return {endTranslateY, reset:false};
+    }
 
     render() {
 
