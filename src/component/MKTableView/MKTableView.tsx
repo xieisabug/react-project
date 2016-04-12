@@ -27,6 +27,7 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
     private startTime: number = 0;
     private containerHeight: number = 0;
     private timer: number;
+    private dampingForceLevel: number = 3;
 
     public state = {
         scrollTopPercent : 0,
@@ -165,13 +166,16 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
 
             this.setState({scrollTopPercent:scrollTop});
         } else if(translateY >= 0) {
+            translateY = translateY / (this.dampingForceLevel + (translateY / (this.containerHeight * 0.5)));
             this.refs['mkTableView']['style']['transitionDuration'] = "0ms";
-            this.refs['mkTableView']['style'].transform = "translate3d(0px, " + (translateY / 3) + "px, 0px)";
+            this.refs['mkTableView']['style'].transform = "translate3d(0px, " + translateY + "px, 0px)";
 
             this.setState({scrollTopPercent:0});
         } else {
+            translateY = Math.abs(translateY) + this.minPointY;
+            translateY = this.minPointY - translateY / (this.dampingForceLevel + (translateY / (this.containerHeight * 0.5)));
             this.refs['mkTableView']['style']['transitionDuration'] = "0ms";
-            this.refs['mkTableView']['style'].transform = "translate3d(0px, " + (this.minPointY - ((Math.abs(translateY) + this.minPointY) /3)) + "px, 0px)";
+            this.refs['mkTableView']['style'].transform = "translate3d(0px, " + translateY + "px, 0px)";
             this.setState({scrollTopPercent:1});
         }
     };
