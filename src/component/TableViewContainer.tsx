@@ -2,8 +2,22 @@
  * Created by Gene on 16/4/8.
  */
 
+import thunk from 'redux-thunk';
+import createLogger = require("redux-logger");
+import { Provider } from 'react-redux';
+import { compose, applyMiddleware, createStore } from 'redux';
+
+import reducer from './MKTableView/MKTableViewReducer';
 import MKTableView from './MKTableView/MKTableView';
 import MKTableViewCell from './MKTableView/MKTableViewCell';
+const logger = createLogger();
+const store = createStore(reducer, compose(
+    applyMiddleware(
+        thunk,
+        logger
+    ),
+    window['devToolsExtension'] ? window['devToolsExtension']() : f => f
+));
 
 class CustomTableViewCell extends MKTableViewCell {
 
@@ -19,12 +33,13 @@ class CustomTableViewCell extends MKTableViewCell {
 class TableViewContainer extends React.Component<any, any> implements MkTableViewDataSource, MKTableViewDelegate {
 
     data = [[{text: 'cell1'}, {text: 'cell2'}, {text: 'cell3'}, {text: 'cell4'}, {text: 'cell5'}, {text: 'cell6'}, {text: 'cell7'}, {text: 'cell8'}, {text: 'cell9'}, {text: 'cell10'}],
-        [{text: 'cell1'}, {text: 'cell2'}, {text: 'cell3'}, {text: 'cell4'}, {text: 'cell5'}, {text: 'cell6'}, {text: 'cell7'}, {text: 'cell8'}, {text: 'cell9'}, {text: 'cell10'}]];
+        [{text: 'cell11'}, {text: 'cell12'}, {text: 'cell13'}, {text: 'cell14'}, {text: 'cell15'}, {text: 'cell16'}, {text: 'cell17'}, {text: 'cell18'}, {text: 'cell19'}, {text: 'cell20'}],
+        [{text: 'cell21'}, {text: 'cell22'}, {text: 'cell23'}, {text: 'cell24'}, {text: 'cell25'}, {text: 'cell26'}, {text: 'cell27'}, {text: 'cell28'}, {text: 'cell29'}, {text: 'cell30'}]];
 
     
     // MKTableViewDataSource
     numberOfSectionsInTableView(tableView) {
-        return 2;
+        return 3;
     }
     
     numberOfRowsInSection(tableView, section) {
@@ -49,7 +64,11 @@ class TableViewContainer extends React.Component<any, any> implements MkTableVie
     }
 
     render() {
-        return <MKTableView dataSource={this} delegate={this}/>
+        return (
+            <Provider store={store}>
+                <MKTableView dataSource={this} delegate={this}/>
+            </Provider>
+        )
     }
 }
 
