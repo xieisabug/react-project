@@ -15,7 +15,7 @@ class MKTableViewScroll extends React.Component<any, any> {
     private scrollStyle: Object;
 
     initializeScroll = () => {
-        const { scrollContainerHeight, scrollContentHeight, scrollTopPercent, showScrollBar} = this.props;
+        const { scrollContainerHeight, scrollContentHeight, scrollTopPercent, showScrollBar, duration} = this.props;
 
         if (scrollContainerHeight != 0) {
 
@@ -36,16 +36,23 @@ class MKTableViewScroll extends React.Component<any, any> {
 
         if (scrollTopPercent != 0) {
             this.scrollTop = this.surplusHeight * scrollTopPercent;
-            this.scrollStyle['marginTop'] = this.scrollTop + 'px';
+            this.scrollStyle['transform'] = "translate3d(0px, "+ this.scrollTop+"px, 0px)"
         }
 
         if (this.scrollStyle) {
-            this.scrollStyle['opacity'] = showScrollBar ? 1 : 0;
 
-            this.scrollStyle['transitionDelay'] = showScrollBar ? "0s" : ".5s";
+            if (duration) {
+                this.scrollStyle['transitionDelay'] = "0s";
+                this.scrollStyle['transitionDuration'] = duration + "ms";
+                this.scrollStyle['transitionTimingFunction'] = "cubic-bezier(0.1, 0.57, 0.1, 1)";
+
+            }
+
+            this.scrollContainerStyle['opacity'] = showScrollBar ? 1 : 0;
+
+            this.scrollContainerStyle['transitionDelay'] = showScrollBar ? "0s" : ".5s";
+
         }
-
-
     };
 
     render() {

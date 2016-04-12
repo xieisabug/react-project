@@ -30,7 +30,8 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
 
     public state = {
         scrollTopPercent : 0,
-        showScrollBar : false
+        showScrollBar : false,
+        duration: 0
     };
 
     componentDidMount() {
@@ -231,6 +232,17 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
             this.refs['mkTableView']['style'].transitionTimingFunction = "cubic-bezier(0.1, 0.57, 0.1, 1)";
             this.refs['mkTableView']['style']['transitionDuration'] = duration+"ms";
             this.refs['mkTableView']['style'].transform = "translate3d(0px, " + destination + "px, 0px)";
+
+            if (destination > 0) {
+                destination = 0;
+            } else if (destination < this.minPointY) {
+                destination = this.minPointY;
+            }
+            
+            this.setState({
+                scrollTopPercent:destination / this.minPointY,
+                duration: duration
+            });
         }
     };
 
@@ -238,16 +250,16 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
 
         const { scrollContainerHeight, scrollContentHeight } = this.props;
         
-        const { scrollTopPercent, showScrollBar } = this.state;
+        const { scrollTopPercent, showScrollBar, duration } = this.state;
 
         this.renderTableView();
 
         return (
-            <div className="mk_table_view_container" ref="mkTableViewContainer" ontr>
+            <div className="mk_table_view_container" ref="mkTableViewContainer">
                 <ul className="mk_table_view" ref="mkTableView" onTouchStart={this.startListScroll} onTouchMove={this.listScroll} onTouchEnd={this.endListScroll} >
                     {this.renderTableView()}
                 </ul>
-                <MKTableViewScroll scrollContainerHeight={scrollContainerHeight} scrollContentHeight={scrollContentHeight} scrollTopPercent={scrollTopPercent} showScrollBar={showScrollBar} />
+                <MKTableViewScroll scrollContainerHeight={scrollContainerHeight} scrollContentHeight={scrollContentHeight} scrollTopPercent={scrollTopPercent} showScrollBar={showScrollBar} duration={duration}/>
             </div>
         )
     }
