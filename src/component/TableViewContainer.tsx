@@ -10,6 +10,9 @@ import { compose, applyMiddleware, createStore } from 'redux';
 import reducer from './MKTableView/MKTableViewReducer';
 import MKTableView from './MKTableView/MKTableView';
 import MKTableViewCell from './MKTableView/MKTableViewCell';
+import MKTableHeaderView from './MKTableView/MKTableHeaderView';
+import MKTableFooterView from './MKTableView/MkTableFooterView';
+
 const logger = createLogger();
 const store = createStore(reducer, compose(
     applyMiddleware(
@@ -27,6 +30,19 @@ class CustomTableViewCell extends MKTableViewCell {
         return (
             <div>{'TestCellContent' + text}</div>
         )
+    }
+}
+
+class CustomTableHeaderView extends MKTableHeaderView {
+
+    initializeSubviews() {
+        return <div>下拉刷新</div>
+    }
+}
+
+class CustomTableFooterView extends MKTableFooterView {
+    initializeSubviews() {
+        return <div>下拉加载更多</div>
     }
 }
 
@@ -66,7 +82,10 @@ class TableViewContainer extends React.Component<any, any> implements MkTableVie
     render() {
         return (
             <Provider store={store}>
-                <MKTableView dataSource={this} delegate={this}/>
+                <MKTableView dataSource={this} delegate={this} tableHeaderView={true} tableFooterView={true} maxPointY={16} minPointY={16}>
+                    <CustomTableHeaderView />
+                    <CustomTableFooterView />
+                </MKTableView>
             </Provider>
         )
     }
