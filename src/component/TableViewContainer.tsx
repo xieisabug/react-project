@@ -8,10 +8,7 @@ import { Provider } from 'react-redux';
 import { compose, applyMiddleware, createStore } from 'redux';
 
 import reducer from './MKTableView/MKTableViewReducer';
-import MKTableView from './MKTableView/MKTableView';
-import MKTableViewCell from './MKTableView/MKTableViewCell';
-import MKTableHeaderView from './MKTableView/MKTableHeaderView';
-import MKTableFooterView from './MKTableView/MkTableFooterView';
+import { MKTableView, MKTableViewCell, MKTableHeaderView, MKTableFooterView} from './MKTableView';
 
 const logger = createLogger();
 const store = createStore(reducer, compose(
