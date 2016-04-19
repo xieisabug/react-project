@@ -2,66 +2,45 @@
  * Created by Gene on 16/4/11.
  */
 
+
 class MKTableViewScroll extends React.Component<any, any> {
-
-    private scrollHeight: number;
-
-    private surplusHeight: number;
     
-    private scrollTop: number = 0;
+    private surplusHeight: number;
+    private scrollContainerStyle: any;
+    private scrollStyle: any;
 
-    private scrollContainerStyle: Object;
+    
+    initializeScrollBar(scrollContainerHeight, scrollContentHeight) {
+        let scrollHeightPercent = scrollContainerHeight / scrollContentHeight;
 
-    private scrollStyle: Object;
+        let scrollHeight = scrollContainerHeight * scrollHeightPercent;
+        this.surplusHeight = scrollContainerHeight - scrollHeight;
 
-    initializeScroll = () => {
-        const { scrollContainerHeight, scrollContentHeight, scrollTopPercent, showScrollBar, duration} = this.props;
+        this.scrollContainerStyle.height = scrollContainerHeight + 'px';
+        this.scrollStyle.height = scrollHeight + 'px'
+    }
 
-        if (scrollContainerHeight != 0) {
 
-            let scrollHeightPercent = scrollContainerHeight / scrollContentHeight;
+    componentDidMount():void {
+        this.scrollContainerStyle = this.refs['scrollBarContainer']['style'];
+        this.scrollStyle = this.refs['scrollBar']['style'];
+    }
+    
+    setScrollOpacity = (opacity) => {
+        this.refs['scrollBarContainer']['style'].opacity = opacity;
+        this.refs['scrollBarContainer']['style'].WebkitTransitionDelay = opacity ? "0s" : ".5s";
+    };
 
-            this.scrollHeight = scrollContainerHeight * scrollHeightPercent;
-
-            this.surplusHeight = scrollContainerHeight - this.scrollHeight;
-
-            this.scrollContainerStyle = {
-                height : scrollContainerHeight + 'px'
-            };
-
-            this.scrollStyle = {
-                height : this.scrollHeight + 'px'
-            };
-        }
-
-        if (scrollTopPercent != 0) {
-            this.scrollTop = this.surplusHeight * scrollTopPercent;
-            this.scrollStyle['transform'] = "translate3d(0px, "+ this.scrollTop+"px, 0px)"
-        }
-
-        if (this.scrollStyle) {
-
-            if (duration) {
-                this.scrollStyle['transitionDelay'] = "0s";
-                this.scrollStyle['transitionDuration'] = duration + "ms";
-                this.scrollStyle['transitionTimingFunction'] = "cubic-bezier(0.1, 0.57, 0.1, 1)";
-
-            }
-
-            this.scrollContainerStyle['opacity'] = showScrollBar ? 1 : 0;
-
-            this.scrollContainerStyle['transitionDelay'] = showScrollBar ? "0s" : ".5s";
-
-        }
+    setScrollTranslateY = (scrollTopPercent, duration) => {
+        let translateY = this.surplusHeight * scrollTopPercent;
+        this.scrollStyle['webkitTransitionDuration'] = duration+"ms";
+        this.scrollStyle['webkitTransform'] = "translate3d(0px, "+ translateY+"px, 0px)";
     };
 
     render() {
-        
-        this.initializeScroll();
-
         return (
-            <div className="mk_table_view_scroll_container" style={this.scrollContainerStyle}>
-                <div className="mk_table_view_scroll" style={this.scrollStyle}></div>
+            <div className="mk_table_view_scroll_container" ref="scrollBarContainer">
+                <div className="mk_table_view_scroll"  ref="scrollBar"></div>
             </div>
         )
     }

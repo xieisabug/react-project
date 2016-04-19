@@ -9,7 +9,7 @@ class MKTableFooterView extends React.Component<any, any> {
     }
 
     render() {
-        return <li>{this.initializeSubviews()}</li>
+        return <li className="mk_table_footer_view">{this.initializeSubviews()}</li>
     }
 }
 

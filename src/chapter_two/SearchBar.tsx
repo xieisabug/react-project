@@ -3,6 +3,17 @@
  */
 
 class SearchBar extends React.Component<any, any> {
+
+
+    componentWillMount():void {
+        console.log("SearchBar->componentWillMount");
+    }
+
+
+    componentDidMount():void {
+        console.log("SearchBar->componentDidMount");
+    }
+
     render() {
         const { filterText, inStockOnly } = this.props;
         return (

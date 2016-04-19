@@ -9,7 +9,7 @@ class MKTableHeaderView extends React.Component<any, any> {
     }
 
     render() {
-        return <li>{this.initializeSubviews()}</li>
+        return <li className="mk_table_header_view">{this.initializeSubviews()}</li>
     }
 }
 
