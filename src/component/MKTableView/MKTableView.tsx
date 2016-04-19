@@ -24,11 +24,6 @@ interface MKTableViewProps {
 }
 
 
-interface MKTableViewScrollInterface extends ReactInstance {
-    initializeScrollBar?: Function;
-    setScrollOpacity?: Function;
-    setScrollTranslateY?: Function
-}
 
 class MKTableView extends React.Component<MKTableViewProps, any> {
 
@@ -36,7 +31,7 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
     private dataSource: MkTableViewDataSource;
     private delegate: MKTableViewDelegate;
 
-    private scrollBar: MKTableViewScrollInterface;
+    private scrollBar: ReactInstance;
     private startPointY: number = 0;
     private startTranslateY: number = 0;
     private startTime: number = 0;
@@ -69,12 +64,7 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
 
         let scrollContainerHeight: number = mkTableViewContainer['offsetHeight'];
         let scrollContentHeight: number = mkTableView['offsetHeight'];
-        let tableViewStyle: Object = {
-            WebkitTransitionDuration: "0ms",
-            WebkitTransform: "translate(0px, 0px) translateZ(0px)",
-            WebkitTransitionTimingFunction: "cubic-bezier(0.1, 0.57, 0.1, 1)"
 
-        };
 
         this.tableViewHeight = scrollContainerHeight;
         this.contentViewHeight = scrollContentHeight;
@@ -82,20 +72,21 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
         this.limitDisplayTopHeight = limitDisplayTopHeight || 0;
         this.maxPointY = limitDisplayTopHeight || this.maxPointY;
         this.minPointY = scrollContainerHeight - (scrollContentHeight - this.limitDisplayBottomHeight);
-        this.minPointY = this.minPointY > 0 ? (tableViewStyle['height'] = scrollContainerHeight +'px') && 0 : this.minPointY;
+        this.minPointY = this.minPointY > 0 ? 0 : this.minPointY;
         this.needScrollBar = scrollContentHeight > scrollContainerHeight;
 
         this.endTranslateY = this.maxPointY * -1;
-
-        this.tableViewStyle = objectAssign({}, tableViewStyle);
 
         window.addEventListener('touchmove', this.touchMove.bind(this), false);
         window.addEventListener('touchend', this.touchEnd, false);
 
         this.scrollStyle = this.refs['mkTableView']['style'];
         this.scrollBar = this.refs['tableViewScroll'];
+        this.scrollStyle.webkitTransitionDuration = "0ms";
+        this.scrollStyle.webkitTransform = "translate(0px, -"+this.limitDisplayTopHeight+"px) translateZ(0px)";
+        this.scrollStyle.WebkitTransitionTimingFunction = "cubic-bezier(0.1, 0.57, 0.1, 1)";
         
-        this.scrollBar.initializeScrollBar(scrollContainerHeight, scrollContentHeight);
+        this.scrollBar['initializeScrollBar'](scrollContainerHeight, scrollContentHeight);
     }
 
 
@@ -206,7 +197,7 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
 
         if (this.needScrollBar) {
 
-            this.scrollBar.setScrollOpacity(1);
+            this.scrollBar['setScrollOpacity'](1);
         }
     };
 
@@ -227,19 +218,19 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
             let scrollTop = translateY / this.minPointY;
 
 
-            this.scrollBar.setScrollTranslateY(scrollTop, 0);
+            this.scrollBar['setScrollTranslateY'](scrollTop, 0);
 
         } else if(translateY >= this.maxPointY) {
             translateY = this.maxPointY + (translateY - this.maxPointY) / (this.dampingForceLevel + (translateY / (this.tableViewHeight * 0.5)));
 
 
-            this.scrollBar.setScrollTranslateY(0, 0);
+            this.scrollBar['setScrollTranslateY'](0, 0);
 
         } else {
             translateY = Math.abs(translateY) + this.minPointY;
             translateY = this.minPointY - translateY / (this.dampingForceLevel + (translateY / (this.tableViewHeight * 0.5)));
 
-            this.scrollBar.setScrollTranslateY(1, 0);
+            this.scrollBar['setScrollTranslateY'](1, 0);
         }
 
         this.lastTranslateY = translateY;
@@ -257,7 +248,7 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
     private touchEnd = (event) => {
 
         if (this.needScrollBar) {
-            this.scrollBar.setScrollOpacity(0);
+            this.scrollBar['setScrollOpacity'](0);
         }
 
         if (this.timer) {
@@ -300,14 +291,19 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
 
             this.endTranslateY = this.lastTranslateY = endTranslateY = destination;
 
+            let scrollTranslateYPercent;
+
             if (destination > 0) {
-                destination = 0;
+                destination = this.limitDisplayTopHeight - 1;
+                scrollTranslateYPercent = 0;
             } else if (destination < this.minPointY) {
-                destination = this.minPointY;
+                destination = this.minPointY - this.limitDisplayBottomHeight + 1;
+                scrollTranslateYPercent = 1;
+            } else {
+                scrollTranslateYPercent = destination / this.minPointY;
             }
 
-
-            this.scrollBar.setScrollTranslateY(destination / this.minPointY, duration);
+            this.scrollBar['setScrollTranslateY'](scrollTranslateYPercent, duration);
 
             this.scrollStyle['webkitTransitionDuration'] = duration+"ms";
             this.scrollStyle['webkitTransform'] = "translate(0px, " + destination + "px) translateZ(0px)";
@@ -347,22 +343,10 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
         return {endTranslateY, reset:false};
     }
 
-    renderScrollBar() {
-
-        const { scrollContainerHeight, scrollContentHeight } = this.props;
-
-        return (
-            <MKTableViewScroll
-                scrollContainerHeight={scrollContainerHeight}
-                scrollContentHeight={scrollContentHeight}
-                ref="tableViewScroll"
-            />
-        );
-    }
 
     render() {
 
-        const { tableHeaderView, tableFooterView } = this.props;
+        const {  scrollContainerHeight, scrollContentHeight, tableHeaderView, tableFooterView } = this.props;
 
         return (
             <div className="mk_table_view_container" ref="mkTableViewContainer">
@@ -373,7 +357,7 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
                         {tableHeaderView && tableFooterView ? this.props.children[1] : tableFooterView && this.props.children}
                     </ul>
                 </div>
-                {this.renderScrollBar()}
+                <MKTableViewScroll scrollContainerHeight={scrollContainerHeight} scrollContentHeight={scrollContentHeight} ref="tableViewScroll" />
             </div>
         )
     }

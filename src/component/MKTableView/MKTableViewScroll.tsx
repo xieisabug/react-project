@@ -31,8 +31,8 @@ class MKTableViewScroll extends React.Component<any, any> {
         this.refs['scrollBarContainer']['style'].WebkitTransitionDelay = opacity ? "0s" : ".5s";
     };
 
-    setScrollTranslateY = (scrollTopPercent, duration) => {
-        let translateY = this.surplusHeight * scrollTopPercent;
+    setScrollTranslateY = (scrollTranslateYPercent, duration) => {
+        let translateY = this.surplusHeight * scrollTranslateYPercent;
         this.scrollStyle['webkitTransitionDuration'] = duration+"ms";
         this.scrollStyle['webkitTransform'] = "translate3d(0px, "+ translateY+"px, 0px)";
     };
