@@ -25,7 +25,18 @@ class CustomTableViewCell extends MKTableViewCell {
         const {text} = this.props;
 
         return (
-            <div>{'TestCellContent' + text}</div>
+            <div >{'TestCellContent' + text}</div>
+        )
+    }
+}
+
+class CustomTableViewCell1 extends MKTableViewCell {
+
+    initializeSubviews() {
+        const {text} = this.props;
+
+        return (
+            <div id="tttttt">{'TestCellContent' + text}</div>
         )
     }
 }
@@ -36,7 +47,7 @@ class CustomTableHeaderView extends MKTableHeaderView {
 
         const {text} = this.props;
 
-        return <div>{text}</div>
+        return <div >{text}</div>
     }
 }
 
@@ -77,7 +88,9 @@ class TableViewContainer extends React.Component<any, any> implements MkTableVie
     }
 
     cellForRowAtIndexPath(tableView, indexPath) {
-        return <CustomTableViewCell {...this.data[indexPath.section][indexPath.row]}/>
+        return indexPath.section == 0 && indexPath.row == 0 ?
+            <CustomTableViewCell1 {...this.data[indexPath.section][indexPath.row]} /> :
+            <CustomTableViewCell {...this.data[indexPath.section][indexPath.row]}/>
     }
 
     titleForHeaderInSection(tableView, section) {
@@ -86,7 +99,7 @@ class TableViewContainer extends React.Component<any, any> implements MkTableVie
     
     // MKTableViewDelegate
     heightForRowAtIndexPath(tableView, indexPath) {
-        return 50;
+        return indexPath.section == 0 && indexPath.row == 0 ? 200: 50;
     }
 
     heightForHeaderInSection(tableView, section) {

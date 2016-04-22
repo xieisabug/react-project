@@ -2,8 +2,6 @@
  * Created by Gene on 16/4/8.
  */
 
-require('./MKTableView.sass');
-
 import ReactInstance = __React.ReactInstance;
 
 import objectAssign = require('object-assign');
@@ -31,7 +29,10 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
     private dataSource: MkTableViewDataSource;
     private delegate: MKTableViewDelegate;
 
+    private allowScrollForThisInstance: boolean = false;
+    private allowScrollForDelegate: boolean;
     private scrollBar: ReactInstance;
+    private startPointX: number = 0;
     private startPointY: number = 0;
     private startTranslateY: number = 0;
     private startTime: number = 0;
@@ -77,6 +78,7 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
 
         this.endTranslateY = this.maxPointY * -1;
 
+        // window.addEventListener('touchmove', this.touchMove.bind(this), false);
         window.addEventListener('touchmove', this.touchMove.bind(this), false);
         window.addEventListener('touchend', this.touchEnd, false);
 
@@ -85,13 +87,13 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
         this.scrollStyle.webkitTransitionDuration = "0ms";
         this.scrollStyle.webkitTransform = "translate(0px, -"+this.limitDisplayTopHeight+"px) translateZ(0px)";
         this.scrollStyle.WebkitTransitionTimingFunction = "cubic-bezier(0.1, 0.57, 0.1, 1)";
+        this.scrollStyle.height = scrollContainerHeight+"px";
         
         this.scrollBar['initializeScrollBar'](scrollContainerHeight, scrollContentHeight);
     }
 
 
     private renderTableView() {
-
 
         let sectionCount: number = 1;
         let cells = [];
@@ -148,13 +150,13 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
             };
 
             if ( delegate && delegate['viewFor' + type + 'InSection'] ) {
-                view = <li style={style} key={type + index}>{delegate['viewFor' + type + 'InSection'](this, index)}</li>
+                view = <li style={style} className={"mk_table_view_cell_"+ type.toLowerCase()} key={type + index}>{delegate['viewFor' + type + 'InSection'](this, index)}</li>
             } else if (dataSource['titleFor' + type + 'InSection']) {
                 title = dataSource['titleFor' + type + 'InSection'](this, index);
 
-                view = <li style={style} key={type + index}>{title}</li>
+                view = <li style={style} className={"mk_table_view_cell_"+ type.toLowerCase()} key={type + index}>{title}</li>
             } else {
-                view = <li style={style} key={type + index} />
+                view = <li style={style} className={"mk_table_view_cell_"+ type.toLowerCase()} key={type + index} />
             }
         }
 
@@ -171,11 +173,11 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
     }
 
     private renderTableViewRow(dataSource, delegate, cells, section, row) {
-        let height = '80px';
+        let height = '44px';
         let style = {};
 
         if (delegate && delegate.heightForRowAtIndexPath) {
-            height = delegate.heightForRowAtIndexPath({section,row}) + 'px';
+            height = delegate.heightForRowAtIndexPath(this, {section,row}) + 'px';
             style['lineHeight'] = height;
         }
 
@@ -189,8 +191,20 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
     }
 
     private touchStart = (event) => {
+        
+        this.allowScrollForThisInstance = true;
+
+        if (this.delegate && this.delegate.onTouchStartEvent) {
+            this.delegate.onTouchStartEvent(this, event);
+        }
+
+        if (event.target.tagName == "A" || event.target.tagName == "INPUT") {
+            return;
+        }
+
         event.preventDefault();
 
+        this.startPointX = event.touches[0].clientX;
         this.startPointY = event.touches[0].clientY;
         this.startTranslateY = this.lastTranslateY;
         this.startTime = event.timeStamp ;
@@ -203,10 +217,27 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
 
     private touchMove = (event) => {
 
+        if (!this.allowScrollForThisInstance) {
+            return;
+        }
+
+        let currentPointX = event.touches[0].clientX;
+        let currentPointY = event.touches[0].clientY;
+        let distX = currentPointX - this.startPointX;
+        let distY = currentPointY - this.startPointY;
+        
+        if(this.delegate && this.delegate.onTouchMoveBegin && this.allowScrollForDelegate === undefined) {
+            this.allowScrollForDelegate = this.delegate.onTouchMoveBegin(this, {x: distX, y: distY});
+        }
+
+        if(!this.allowScrollForDelegate && this.delegate && this.delegate.onTouchMoveEvent) {
+            this.delegate.onTouchMoveEvent(this, event);
+            return;
+        }
+
         event.preventDefault();
 
-        let currentPointY = event.touches[0].clientY;
-        let distY = currentPointY - this.startPointY;
+        
         let translateY = distY + this.endTranslateY;
 
         if ((event.timeStamp - this.startTime > 300 && Math.abs(distY) < 10) ) {
@@ -246,6 +277,21 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
     };
 
     private touchEnd = (event) => {
+
+        if ( !this.allowScrollForThisInstance ) {
+            return;
+        } else {
+            this.allowScrollForThisInstance = false;
+        }
+
+        if (this.allowScrollForDelegate === false && this.delegate && this.delegate.onTouchEndEvent) {
+            this.delegate.onTouchEndEvent(this, event);
+            this.allowScrollForDelegate = undefined;
+            return;
+        } else {
+            this.allowScrollForDelegate = undefined;
+        }
+
 
         if (this.needScrollBar) {
             this.scrollBar['setScrollOpacity'](0);

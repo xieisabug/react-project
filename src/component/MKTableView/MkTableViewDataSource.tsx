@@ -4,7 +4,6 @@ import ReactElement = __React.ReactElement;
  * Created by Gene on 16/4/8.
  */
 
-/// <reference path="../../../typings/tsd.d.ts" />
 interface IndexPath {
     section: number,
     row:number
