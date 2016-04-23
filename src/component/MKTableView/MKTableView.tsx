@@ -53,7 +53,7 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
     public contentViewHeight: number = 0;
 
     componentWillMount() {
-        
+
         this.dataSource = this.props.dataSource;
         this.delegate = this.props.delegate;
         this.bounce = typeof this.props.bounce == 'boolean' ? this.props.bounce : this.bounce;
@@ -78,8 +78,7 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
 
         this.endTranslateY = this.maxPointY * -1;
 
-        // window.addEventListener('touchmove', this.touchMove.bind(this), false);
-        window.addEventListener('touchmove', this.touchMove.bind(this), false);
+        window.addEventListener('touchmove', this.touchMove, false);
         window.addEventListener('touchend', this.touchEnd, false);
 
         this.scrollStyle = this.refs['mkTableView']['style'];
@@ -88,7 +87,7 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
         this.scrollStyle.webkitTransform = "translate(0px, -"+this.limitDisplayTopHeight+"px) translateZ(0px)";
         this.scrollStyle.WebkitTransitionTimingFunction = "cubic-bezier(0.1, 0.57, 0.1, 1)";
         this.scrollStyle.height = scrollContainerHeight+"px";
-        
+
         this.scrollBar['initializeScrollBar'](scrollContainerHeight, scrollContentHeight);
     }
 
@@ -191,8 +190,6 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
     }
 
     private touchStart = (event) => {
-        
-        this.allowScrollForThisInstance = true;
 
         if (this.delegate && this.delegate.onTouchStartEvent) {
             this.delegate.onTouchStartEvent(this, event);
@@ -201,9 +198,9 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
         if (event.target.tagName == "A" || event.target.tagName == "INPUT") {
             return;
         }
-
         event.preventDefault();
 
+        this.allowScrollForThisInstance = true;
         this.startPointX = event.touches[0].clientX;
         this.startPointY = event.touches[0].clientY;
         this.startTranslateY = this.lastTranslateY;
@@ -225,7 +222,7 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
         let currentPointY = event.touches[0].clientY;
         let distX = currentPointX - this.startPointX;
         let distY = currentPointY - this.startPointY;
-        
+
         if(this.delegate && this.delegate.onTouchMoveBegin && this.allowScrollForDelegate === undefined) {
             this.allowScrollForDelegate = this.delegate.onTouchMoveBegin(this, {x: distX, y: distY});
         }
@@ -237,7 +234,6 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
 
         event.preventDefault();
 
-        
         let translateY = distY + this.endTranslateY;
 
         if ((event.timeStamp - this.startTime > 300 && Math.abs(distY) < 10) ) {
@@ -278,7 +274,7 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
 
     private touchEnd = (event) => {
 
-        if ( !this.allowScrollForThisInstance ) {
+        if (!this.allowScrollForThisInstance) {
             return;
         } else {
             this.allowScrollForThisInstance = false;
@@ -291,7 +287,6 @@ class MKTableView extends React.Component<MKTableViewProps, any> {
         } else {
             this.allowScrollForDelegate = undefined;
         }
-
 
         if (this.needScrollBar) {
             this.scrollBar['setScrollOpacity'](0);
