@@ -3,9 +3,9 @@
  */
 
 import { Router, Route, hashHistory, IndexRoute } from 'react-router';
-import { syncHistoryWithStore, routerReducer, routerMiddleware } from 'react-router-redux'
+import { syncHistoryWithStore, routerMiddleware } from 'react-router-redux'
+import { compose, applyMiddleware, createStore } from 'redux';
 import { Provider } from 'react-redux';
-import { compose, combineReducers, applyMiddleware, createStore } from 'redux';
 import thunk from 'redux-thunk';
 import createLogger = require("redux-logger");
 
@@ -16,22 +16,26 @@ import TableComponent from './component/user.table.component';
 import UserFormComponent from './component/user.form.component';
 
 const logger = createLogger();
-
 const store = createStore(reducer, compose(
-    applyMiddleware(thunk, logger, routerMiddleware(hashHistory)),
+    applyMiddleware(
+        thunk,
+        logger,
+        routerMiddleware(hashHistory)
+    ),
     window['devToolsExtension'] ? window['devToolsExtension']() : f => f
 ));
 const history = syncHistoryWithStore(hashHistory, store);
 
 class AppComponent extends React.Component <any, any> {
+
     render() {
         return (
             <Provider store={store}>
                 <Router history={history}>
-                    <Route path="/" component={LogonComponent} />
-                    <Route path="/manager" component={ManagerComponent} />
-                    <Route path="/newUser" component={UserFormComponent} />
-                    <Route path="/modifyUser/:username/:age/:seq" component={UserFormComponent} />
+                    <Route path="/" component={LogonComponent}/>
+                    <Route path="/manager" component={ManagerComponent}/>
+                    <Route path="/newUser" component={UserFormComponent}/>
+                    <Route path="/modifyUser/:seq" component={UserFormComponent}/>
                 </Router>
             </Provider>
         )

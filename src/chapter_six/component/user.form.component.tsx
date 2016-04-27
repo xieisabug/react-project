@@ -9,10 +9,6 @@ import { bindActionCreators } from 'redux';
 class NewUserComponent extends React.Component<any, any> {
 
 
-    componentWillMount() {
-        const {params} = this.props;
-        this.setState(params);
-    }
 
     addUser = () => {
         const { addUserAction } = this.props;
@@ -23,23 +19,30 @@ class NewUserComponent extends React.Component<any, any> {
     };
 
     modifyUser = () => {
-        const { modifyUserPropertyAction } = this.props;
+        const { modifyUserPropertyAction, params } = this.props;
         modifyUserPropertyAction(
             this.refs['username']['value'],
             this.refs['age']['value'],
-            this.state['seq']
+            params.seq
         );
     };
 
     render() {
-        const { route } = this.props;
+        const { route, user } = this.props;
         return (
             <div>
-                <input ref="username" placeholder="username" defaultValue={this.state.username}/>
-                <input ref="age" placeholder="age" defaultValue={this.state.age}/>
+                <input ref="username" placeholder="username" defaultValue={user.userName}/>
+                <input ref="age" placeholder="age" defaultValue={user.age}/>
                 <button onClick={route.path === '/newUser' ? this.addUser : this.modifyUser}>save</button>
             </div>
         )
+    }
+}
+
+function mapStateToProps(state) {
+    let {user} = state.managerReducer;
+    return {
+        user
     }
 }
 
@@ -48,4 +51,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-export default connect(null, mapDispatchToProps)(NewUserComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(NewUserComponent);

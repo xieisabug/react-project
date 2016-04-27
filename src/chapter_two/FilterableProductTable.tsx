@@ -12,6 +12,15 @@ class FilterableProductTable extends React.Component<any, any> {
         this.state = {'filterText':'',inStockOnly:false}
     }
 
+    componentWillMount():void {
+        console.log("FilterableProductTable->componentWillMount");
+    }
+
+
+    componentDidMount():void {
+        console.log("FilterableProductTable->componentDidMount");
+    }
+
     render() {
         const {products} = this.props;
 

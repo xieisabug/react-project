@@ -6,7 +6,8 @@ module.exports = {
         'chapter_four': './build/chapter_four/chapter_four.js',
         'chapter_five': './build/chapter_five/chapter_five.js',
         'chapter_six': './build/chapter_six/chapter_six.js',
-        'chapter_seven': './build/chapter_seven/chapter_seven.js'
+        'chapter_seven': './build/chapter_seven/chapter_seven.js',
+        'component': './build/component/TableViewDemo.js'
     },
     output: {
         path: './release/dist',
